@@ -1,5 +1,5 @@
 # RISCY VM
-RISCVY VM is an attempt at writing a Dynamic Translator for the RISC-V ISA. Insperation on the design of the VM is taken from QEMU, a Fast and Protable Dynamic Translator by Fabrice Bellard. The current state is more of a proof of concept than a useful or fully fuctioning tool.
+RISCVY VM is an attempt at writing a Dynamic Translator for the RISC-V ISA. Insperation on the design of the VM is taken from QEMU, a Fast and Protable Dynamic Translator by Fabrice Bellard. The current state is more of a proof of concept than a useful or fully fuctioning tool. 
 
 ## Components:
 ### VA Space Simulation
@@ -25,6 +25,7 @@ There will only be a subset of the RV32I ISA Implemented. Instructions that will
 |BLTU|Branch <= Unsigned|SB|110|11000|
 |BGEU| Breanch >= Unsigned|SB|111|11000|
 |LW| Load Word |I|010|00000|
+|SW|Store Word| I|010|01000|
 |ADDI| ADD Immediate|I|000|00100|
 |XORI|XOR Immediate |I|100|00100|
 |ORI| OR Immediate|I|110|00100|
