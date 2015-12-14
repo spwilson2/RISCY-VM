@@ -1,11 +1,27 @@
+#include <inttypes.h>
 
 #ifndef PARSE_H
 #define PARSE_H
 
 #define reg_fp reg_s0 //s0 is also known as frame pointer
+
+#ifndef BENDIAN
+
 #define RV32I(instr) (!((instr & 0x3) ^0x3))
+
+#define OP_BITMASK(instr) (instr & 0xfe00e07f)
 #define OPCODE_BITMASK(instr) (instr & 0x7f)
 #define FUNCT3_BITMASK(instr) (instr >> 12 & 0x07)
+
+#define RD_BITFIX(instr) (instr >> 7 & 0x1f)
+#define RS1_BITFIX(instr) (instr >> 15 & 0x1f)
+#define IMM12_BITFIX(instr) (instr >> 20 & 0x1f)
+
+//#define I_MAGIC  0xf0
+//#define R_MAGIC  0xd0
+//#define SB_MAGIC 0xf1
+
+#endif
 
 enum __regs {
     reg_zero,   // Hard-wired zero
@@ -49,87 +65,66 @@ enum __instr {
     __sbreak
 };
 
+enum __instr_type {
+    R_INSTR, I_INSTR, SB_INSTR
+};
+
 
 struct __r_instr {
     enum __regs rd;
     enum __regs rs1;
     enum __regs rs2;
-    enum __instr inst;
+    enum __instr op;
 };
 
 struct __sb_instr {
     enum __regs rs1;
     enum __regs rs2;
-    long int unsigned imm;
-    enum __instr inst;
+    uint32_t imm;
+    enum __instr op;
 };
 
 struct __i_instr {
     enum __regs rd;
-    enum __regs src1;
-    long int unsigned imm;
-    enum __instr inst;
+    enum __regs rs1;
+    uint32_t imm;
+    enum __instr op;
 };
 
-typedef union instruction {
-    struct __r_instr r_instr;
-    struct __sb_instr sb_instr;
-    struct __i_instr i_instr;
+union instruction_info {
+    struct __r_instr r;
+    struct __sb_instr s;
+    struct __i_instr i;
+};
+
+typedef struct instruction {
+    union instruction_info instr;
+    enum __instr_type instr_type;
 }instruction;
 
-
-/////////     OPCODES     /////////
-#define LUI_OPCODE      0x0037
-#define JAL_OPCODE      0x006f
-
-#define BRANCH_OPCODE   0x00c3
-#define BEQ_OPCODE      0x00c3
-#define BNE_OPCODE      0x00c3
-#define BLT_OPCODE      0x00c3
-#define BGE_OPCODE      0x00c3
-#define BLTU_OPCODE     0x00c3
-#define BGEU_OPCODE     0x00c3
-                              
-#define LW_OPCODE       0x0003
-#define SW_OPCODE       0x0023
-                              
-#define IMM_OPCODE      0x0013
-#define ADDI_OPCODE     0x0013
-#define XORI_OPCODE     0x0013
-#define ORI_OPCODE      0x0013
-#define ANDI_OPCODE     0x0013
-                              
-#define REG_OPCODE      0x0033
-#define ADD_OPCODE      0x0033
-#define SUB_OPCODE      0x0033
-#define XOR_OPCODE      0x0033
-#define OR_OPCODE       0x0033
-#define AND_OPCODE      0x0033
-                              
-#define SBREAK_OPCODE   0x0073
-
-
-
-//////////      FUNCT3's     ////////
-#define jal_FUNCT3      0x0000
-#define beq_FUNCT3      0x0000
-#define bne_FUNCT3      0x1000
-#define blt_FUNCT3      0x4000
-#define bge_FUNCT3      0x5000
-#define bltu_FUNCT3     0x6000
-#define bgeu_FUNCT3     0x7000
-#define lw_FUNCT3       0x2000
-#define sw_FUNCT3       0x2000
-#define addi_FUNCT3     0x0000
-#define xori_FUNCT3     0x4000
-#define ori_FUNCT3      0x6000
-#define andi_FUNCT3     0x7000
-#define add_FUNCT3      0x0000
-#define sub_FUNCT3      0x0000
-#define xor_FUNCT3      0x4000
-#define or_FUNCT3       0x6000
-#define and_FUNCT3      0x7000
-#define sbreak _FUNCT3  0x0000
+/////////     OPCODES/OP     /////////
+#ifndef BENDIAN
+#define LUI_OPCODE      0x00000037
+#define JAL_OPCODE      0x0000006f
+#define BEQ_OPCODE      0x000000c3
+#define BNE_OPCODE      0x000010c3
+#define BLT_OPCODE      0x000040c3
+#define BGE_OPCODE      0x000050c3
+#define BLTU_OPCODE     0x000060c3
+#define BGEU_OPCODE     0x000070c3
+#define LW_OPCODE       0x00002003
+#define SW_OPCODE       0x00002023
+#define ADDI_OPCODE     0x00000013
+#define XORI_OPCODE     0x00004013
+#define ORI_OPCODE      0x00006013
+#define ANDI_OPCODE     0x00007013
+#define ADD_OPCODE      0x00000033
+#define SUB_OPCODE      0x40000033
+#define XOR_OPCODE      0x00004033
+#define OR_OPCODE       0x00006033
+#define AND_OPCODE      0x00007033
+#define SBREAK_OPCODE   0x00010073
+#endif
 
 //jal
 //beq
@@ -150,5 +145,7 @@ typedef union instruction {
 //or
 //and
 //sbreak
+
+char parse_instr(uint32_t *, instruction *);
 
 #endif

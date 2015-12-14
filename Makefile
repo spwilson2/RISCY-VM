@@ -1,8 +1,8 @@
 #TODO: Add header change detection
 # Allow directories
 CC:=gcc
-CFLAGS:=-c -Wall
-LDFLAGS:=
+CFLAGS:=-c -Wall -g #-DDEBUG
+LDFLAGS:= 
 SOURCES:= main.c parse.c
 OBJECTS:=$(SOURCES:.c=.o)
 EXECUTABLE:=a.out
