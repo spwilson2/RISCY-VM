@@ -15,11 +15,14 @@
 
 #define RD_BITFIX(instr) (instr >> 7 & 0x1f)
 #define RS1_BITFIX(instr) (instr >> 15 & 0x1f)
-#define IMM12_BITFIX(instr) (instr >> 20 & 0x1f)
+#define RS2_BITFIX(instr) (instr >> 20 & 0x1f)
+#define IMM_I_BITFIX(instr) (instr >> 20 & 0x1f)
+#define IMM_SB_BITFIX(instr) (((instr & 0x80000000) >> 19)\
+        + ((instr >> 25) << 10) \
+        + ((instr >> 7) & 0x0000001e) \
+        + ((instr & 0x00000080) << 4))
 
-//#define I_MAGIC  0xf0
-//#define R_MAGIC  0xd0
-//#define SB_MAGIC 0xf1
+#define IMM_U_BITMASK(instr) (instr & 0xfffff000)
 
 #endif
 
@@ -52,6 +55,7 @@ enum __instr {
     __bge,
     __bltu,
     __bgeu,
+    __sw,
     __lw,
     __addi,
     __xori,
@@ -66,9 +70,8 @@ enum __instr {
 };
 
 enum __instr_type {
-    R_INSTR, I_INSTR, SB_INSTR
+    R_INSTR, I_INSTR, SB_INSTR, U_INSTR
 };
-
 
 struct __r_instr {
     enum __regs rd;
@@ -84,6 +87,12 @@ struct __sb_instr {
     enum __instr op;
 };
 
+struct __u_instr {
+    enum __regs rd;
+    uint32_t imm;
+    enum __instr op;
+};
+
 struct __i_instr {
     enum __regs rd;
     enum __regs rs1;
@@ -93,8 +102,9 @@ struct __i_instr {
 
 union instruction_info {
     struct __r_instr r;
-    struct __sb_instr s;
+    struct __sb_instr sb;
     struct __i_instr i;
+    struct __u_instr u;
 };
 
 typedef struct instruction {
