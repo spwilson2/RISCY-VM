@@ -16,7 +16,7 @@ There will only be a subset of the RV32I ISA Implemented. Instructions that will
 
 | Acronym        | Instruction           | Type  | Funct3 | Opcode[6:2] |
 | ------------- | ------------------------- | ----- | -------- | -------- |
-| LUI | Load Unsigned Immediate | I | N/A | 01101 |
+| LUI | Load Upper Immediate | I | N/A | 01101 |
 | JAL |Jump And Link | I |000|11001|
 | BEQ| Branch =|SB|000|11000|
 |BNE | Branch != |SB|001|11000|
